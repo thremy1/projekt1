@@ -1,0 +1,103 @@
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+#include <cmath>
+ 
+using namespace std;
+ 
+// Function to calculate the determinant of a matrix
+double CalculateMatrixDeterminant(unsigned int size, vector<vector<double>>& matrix) {
+    int z = 1;
+ 
+    for (unsigned int k = 0; k < size - 1; k++) {
+        double max = matrix[k][k];
+        unsigned int r = k;
+ 
+        for (unsigned int i = k; i < size; i++) {
+            if (fabs(matrix[i][k]) > fabs(max)) {
+                max = matrix[i][k];
+                r = i;
+            }
+        }
+ 
+        if (max != 0) {
+            if (r != k) {
+                z = -z;
+ 
+                for (unsigned int j = k; j < size; j++) {
+                    swap(matrix[k][j], matrix[r][j]);
+                }
+            }
+ 
+            for (unsigned int i = k + 1; i < size; i++) {
+                double pom = matrix[i][k];
+ 
+                for (unsigned int j = k; j < size; j++) {
+                    matrix[i][j] -= pom * matrix[k][j] / max;
+                }
+            }
+        } else {
+            return 0;
+        }
+    }
+ 
+    double w = 1.0;
+    for (unsigned int k = 0; k < size; k++) {
+        w *= matrix[k][k];
+    }
+ 
+    return w * z;
+}
+ 
+int main() {
+    cout << "Podaj rozmiar macierzy kwadratowej (n): ";
+    string value;
+    cin >> value;
+ 
+    unsigned int size;
+    try {
+        size = stoi(value);
+    } catch (...) {
+        throw runtime_error("Niepoprawny rozmiar tabeli!");
+    }
+ 
+    cout << "Wprowadź każdy wiersz macierzy osobno jako liczby oddzielone spacją." << endl;
+    cout << "Następnie daj enter i wprowadź kolejny wiersz:" << endl;
+ 
+    vector<vector<double>> matrix(size, vector<double>(size));
+ 
+    for (unsigned int i = 0; i < size; i++) {
+        string stringMatrix;
+        cin.ignore();
+        getline(cin, stringMatrix);
+ 
+        vector<string> preparedStringMatrix;
+        string temp;
+        for (char c : stringMatrix) {
+            if (c == ' ') {
+                preparedStringMatrix.push_back(temp);
+                temp.clear();
+            } else {
+                temp += c;
+            }
+        }
+        preparedStringMatrix.push_back(temp);
+ 
+        if (preparedStringMatrix.size() != size) {
+            throw runtime_error("Niewłaściowa ilość danych!");
+        }
+ 
+        for (unsigned int k = 0; k < size; k++) {
+            try {
+                matrix[i][k] = stoi(preparedStringMatrix[k]);
+            } catch (...) {
+                throw runtime_error("Niepoprawna wartość w macierzy!");
+            }
+        }
+    }
+ 
+    cout << "Wyznacznik wprowadzonej przez ciebie macierzy " << size << "x" << size
+         << " wynosi: " << CalculateMatrixDeterminant(size, matrix) << endl;
+ 
+    return 0;
+}
